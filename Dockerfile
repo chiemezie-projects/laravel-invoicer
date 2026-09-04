@@ -1,9 +1,9 @@
 FROM php:8.3-cli
 
-# System deps
+# System deps - pdo_sqlite removed for Render (uses pgsql), keeps build simple
 RUN apt-get update && apt-get install -y \
-    git unzip libpq-dev libzip-dev libonig-dev libxml2-dev libsqlite3-dev pkg-config \
-    && docker-php-ext-install pdo pdo_pgsql pdo_mysql pdo_sqlite bcmath zip \
+    git unzip libpq-dev libzip-dev libonig-dev libxml2-dev \
+    && docker-php-ext-install pdo pdo_pgsql pdo_mysql bcmath zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Composer
