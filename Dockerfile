@@ -1,28 +1,22 @@
 FROM php:8.3-cli
 
-# System deps - pdo_sqlite removed for Render (uses pgsql), keeps build simple
+# System deps
 RUN apt-get update && apt-get install -y \
     git unzip libpq-dev libzip-dev libonig-dev libxml2-dev \
     && docker-php-ext-install pdo pdo_pgsql pdo_mysql bcmath zip \
     && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Composer
 COPY --from=composer:2.7 /usr/bin/composer /usr/bin/composer
 
 WORKDIR /var/www/html
 
-# Copy app first for caching
-COPY composer.json composer.lock ./
-RUN composer install --no-dev --no-scripts --no-autoloader --prefer-dist
-
 COPY . .
 
-RUN composer dump-autoload --optimize \
+RUN composer install --no-dev --optimize-autoloader --no-interaction --no-progress \
     && chown -R www-data:www-data storage bootstrap/cache \
     && chmod -R 775 storage bootstrap/cache \
-    && mkdir -p database && touch database/database.sqlite
+    && mkdir -p database && touch database/database.sqlite || true
 
-# Render sets $PORT (default 10000)
 EXPOSE 10000
 
 CMD sh -c "php artisan config:clear && \
