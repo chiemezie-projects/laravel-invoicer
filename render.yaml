@@ -1,0 +1,56 @@
+services:
+  - type: web
+    name: laravel-invoicer
+    runtime: docker
+    plan: free
+    dockerfilePath: ./Dockerfile
+    dockerContext: .
+    healthCheckPath: /
+    autoDeploy: false
+    envVars:
+      - key: APP_ENV
+        value: production
+      - key: APP_DEBUG
+        value: false
+      - key: APP_KEY
+        generateValue: true
+      - key: APP_URL
+        value: https://laravel-invoicer.onrender.com
+      - key: LOG_CHANNEL
+        value: stack
+      - key: LOG_LEVEL
+        value: debug
+      - key: DB_CONNECTION
+        value: pgsql
+      - key: DB_HOST
+        fromDatabase:
+          name: invoicer-db
+          property: host
+      - key: DB_PORT
+        fromDatabase:
+          name: invoicer-db
+          property: port
+      - key: DB_DATABASE
+        fromDatabase:
+          name: invoicer-db
+          property: database
+      - key: DB_USERNAME
+        fromDatabase:
+          name: invoicer-db
+          property: user
+      - key: DB_PASSWORD
+        fromDatabase:
+          name: invoicer-db
+          property: password
+      - key: SESSION_DRIVER
+        value: database
+      - key: CACHE_STORE
+        value: database
+      - key: QUEUE_CONNECTION
+        value: database
+
+databases:
+  - name: invoicer-db
+    plan: free
+    databaseName: invoicer
+    user: invoicer
